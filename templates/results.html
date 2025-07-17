@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tax Comparison Results</title>
+    <link href="https://fonts.googleapis.com/css2?family=Aptos+Display:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Aptos Display', Arial, sans-serif; background: #f7faff; color: #222; }
+        .container { max-width: 900px; margin: 40px auto; background: #fff; border-radius: 18px; box-shadow: 0 4px 24px rgba(0, 80, 200, 0.08); padding: 32px 24px; }
+        h2 { color: #0a3d91; text-align: center; margin-bottom: 2em; }
+        .cards { display: flex; gap: 32px; justify-content: center; flex-wrap: wrap; }
+        .card { flex: 1 1 320px; background: #f0f4fa; border-radius: 14px; padding: 2em 1.5em; box-shadow: 0 2px 12px rgba(0,80,200,0.06); text-align: center; border: 3px solid transparent; transition: border 0.2s, box-shadow 0.2s, background 0.2s; cursor: pointer; }
+        .card.selected { border: 3px solid #1976d2; background: #e3f0ff; box-shadow: 0 4px 24px rgba(25, 118, 210, 0.12); }
+        .card:hover { box-shadow: 0 6px 32px rgba(25, 118, 210, 0.18); background: #eaf4ff; }
+        .regime-title { font-size: 1.3em; font-weight: 700; margin-bottom: 0.7em; letter-spacing: 0.5px; }
+        .tax-amount { font-size: 2.2em; color: #1976d2; font-weight: 700; margin-bottom: 0.5em; transition: color 0.2s; }
+        .label { color: #555; font-size: 1em; margin-bottom: 0.5em; }
+        .summary { margin-top: 2em; text-align: center; font-size: 1.1em; color: #0a3d91; }
+        .btn { background: #1976d2; color: #fff; font-size: 1.1rem; padding: 0.7em 2em; border: none; border-radius: 8px; cursor: pointer; font-family: inherit; font-weight: 700; transition: background 0.2s, box-shadow 0.2s; box-shadow: 0 2px 8px rgba(25, 118, 210, 0.08); }
+        .btn:hover { background: #1251a3; box-shadow: 0 4px 16px rgba(25, 118, 210, 0.16); }
+        .breakup { margin-top: 2.5em; }
+        .breakup table { width: 100%; max-width: 500px; margin: auto; border-collapse: collapse; font-size: 1.08em; background: #f8fbff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,80,200,0.06); }
+        .breakup th, .breakup td { padding: 10px 12px; border: 1px solid #bcd; }
+        .breakup th { background: #e3f0ff; font-weight: 700; }
+        .breakup tr:nth-child(even) { background: #f0f4fa; }
+        .breakup tr:hover { background: #eaf4ff; transition: background 0.2s; }
+        @media (max-width: 700px) { .cards { flex-direction: column; gap: 18px; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Tax Comparison: Old vs. New Regime</h2>
+        <div class="cards">
+            <div class="card {% if selected_regime == 'old' %}selected{% endif %}">
+                <div class="regime-title">Old Regime</div>
+                <div class="tax-amount">₹{{ tax_old_regime }}</div>
+                <div class="label">Your tax under the Old Regime</div>
+            </div>
+            <div class="card {% if selected_regime == 'new' %}selected{% endif %}">
+                <div class="regime-title">New Regime</div>
+                <div class="tax-amount">₹{{ tax_new_regime }}</div>
+                <div class="label">Your tax under the New Regime</div>
+            </div>
+        </div>
+        <div class="summary">
+            {% if best_regime == selected_regime %}
+                <b>Great choice!</b> The <span style="color:#1976d2">{{ best_regime|capitalize }} Regime</span> is optimal for you.<br>
+            {% else %}
+                <b>Note:</b> The <span style="color:#1976d2">{{ best_regime|capitalize }} Regime</span> would save you more tax.<br>
+            {% endif %}
+        </div>
+        <div style="text-align:center; margin-top:2em;">
+            <a href="{{ url_for('advisor') }}">
+                <button class="btn" style="background:#1976d2;color:#fff;font-size:1.1rem;padding:0.7em 2em;border:none;border-radius:8px;cursor:pointer;font-family:inherit;font-weight:700;">Get Personalized AI Tax Advice</button>
+            </a>
+        </div>
+        <div class="breakup" style="margin-top:2.5em;">
+            <h3 style="color:#0a3d91;">Financial Breakup</h3>
+            <table style="width:100%;max-width:500px;margin:auto;border-collapse:collapse;font-size:1.08em;">
+                <tr style="background:#e3f0ff;font-weight:700;">
+                    <td style="padding:8px;border:1px solid #bcd;">Component</td>
+                    <td style="padding:8px;border:1px solid #bcd;">Amount (INR)</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px;border:1px solid #bcd;">Gross Salary</td>
+                    <td style="padding:8px;border:1px solid #bcd;">₹{{ gross_salary or 0 }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px;border:1px solid #bcd;">Basic Salary</td>
+                    <td style="padding:8px;border:1px solid #bcd;">₹{{ basic_salary or 0 }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px;border:1px solid #bcd;">HRA</td>
+                    <td style="padding:8px;border:1px solid #bcd;">₹{{ hra_received or 0 }}</td>
+                </tr>
+                <tr>
+                    <td style="padding:8px;border:1px solid #bcd;">Deduction 80C</td>
+                    <td style="padding:8px;border:1px solid #bcd;">₹{{ deduction_80c or 0 }}</td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</body>
+</html> 

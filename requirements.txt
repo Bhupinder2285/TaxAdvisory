@@ -1,0 +1,6 @@
+Flask
+psycopg2-binary
+python-dotenv
+PyPDF2
+pytesseract
+pdf2image 
